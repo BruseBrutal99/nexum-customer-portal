@@ -1,8 +1,31 @@
 -- Billing mode + portal booking requests (payment gate before carrier book)
+-- Idempotent: safe to re-run in Supabase SQL editor
 
 alter table public.portal_customers
-  add column if not exists billing_mode text not null default 'prepaid'
-    check (billing_mode in ('prepaid', 'invoice_credit'));
+  add column if not exists billing_mode text;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'portal_customers_billing_mode_check'
+  ) then
+    alter table public.portal_customers
+      add constraint portal_customers_billing_mode_check
+      check (billing_mode in ('prepaid', 'invoice_credit'));
+  end if;
+end $$;
+
+update public.portal_customers
+set billing_mode = 'prepaid'
+where billing_mode is null;
+
+alter table public.portal_customers
+  alter column billing_mode set default 'prepaid';
+
+alter table public.portal_customers
+  alter column billing_mode set not null;
 
 create table if not exists public.portal_booking_requests (
   id uuid primary key default gen_random_uuid(),
@@ -30,12 +53,14 @@ create index if not exists portal_booking_requests_payment_status_idx
 create index if not exists portal_booking_requests_customer_id_idx
   on public.portal_booking_requests (customer_id);
 
+drop trigger if exists portal_booking_requests_updated_at on public.portal_booking_requests;
 create trigger portal_booking_requests_updated_at
 before update on public.portal_booking_requests
 for each row execute function public.set_updated_at();
 
 alter table public.portal_booking_requests enable row level security;
 
+drop policy if exists portal_booking_requests_admin_all on public.portal_booking_requests;
 create policy portal_booking_requests_admin_all on public.portal_booking_requests
   for all using (public.is_portal_admin())
   with check (public.is_portal_admin());
