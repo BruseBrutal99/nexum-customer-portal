@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { SITE_CONTACT } from "@/lib/site-contact";
 
@@ -7,31 +8,48 @@ export function ContactContent() {
   const { locale, t } = useLocale();
 
   return (
-    <div className="bg-[var(--color-soft)] py-12 sm:py-16">
-      <div className="mx-auto max-w-[var(--max-width)] px-4 sm:px-6">
-        <h1 className="display text-4xl text-[var(--color-accent)] sm:text-5xl">
-          {t.contact.title}
-        </h1>
-        <p className="mt-3 max-w-2xl text-sm text-[var(--color-ink-muted)] sm:text-base">
-          {t.contact.lead}
-        </p>
+    <div className="bg-[var(--color-sand-soft)]">
+      <section className="relative overflow-hidden border-b border-[var(--color-sand-mid)]">
+        <div className="absolute inset-0">
+          <Image
+            src="/brand/hero-hirtshals.webp"
+            alt=""
+            fill
+            priority
+            className="object-cover object-[50%_40%]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[rgba(11,42,74,0.88)] via-[rgba(11,42,74,0.72)] to-[rgba(202,164,105,0.35)]" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-[var(--max-width)] px-4 py-16 sm:px-6 sm:py-20">
+          <p className="text-sm font-medium tracking-wide text-[var(--color-sand-mid)] uppercase">
+            Nor Courier
+          </p>
+          <h1 className="display mt-2 max-w-xl text-4xl text-white sm:text-5xl">
+            {t.contact.title}
+          </h1>
+          <p className="mt-4 max-w-xl text-sm text-white/85 sm:text-base">
+            {t.contact.lead}
+          </p>
+        </div>
+      </section>
 
-        <div className="mt-10 space-y-5">
-          <section className="border border-[var(--color-accent)]/25 bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">
+      <section className="mx-auto max-w-[var(--max-width)] px-4 py-12 sm:px-6 sm:py-16">
+        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="border border-[var(--color-sand-mid)] bg-white p-6 sm:p-8">
+            <h2 className="text-lg font-semibold text-[var(--color-accent)]">
               {t.contact.generalTitle}
             </h2>
             <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
               {t.contact.generalText} {t.contact.hours}.
             </p>
-            <ul className="mt-5 space-y-3 text-sm text-[var(--color-ink)]">
+            <ul className="mt-6 space-y-3 text-sm text-[var(--color-ink)]">
               <li>
                 <span className="text-[var(--color-ink-muted)]">
                   {t.contact.emailLabel}:{" "}
                 </span>
                 <a
                   href={`mailto:${SITE_CONTACT.email}`}
-                  className="font-medium hover:underline"
+                  className="font-medium text-[var(--color-accent)] hover:underline"
                 >
                   {SITE_CONTACT.email}
                 </a>
@@ -48,19 +66,98 @@ export function ContactContent() {
                 </a>
               </li>
             </ul>
-          </section>
+            <p className="mt-6 text-xs text-[var(--color-ink-muted)]">
+              {t.contact.cvr}
+            </p>
+          </div>
 
-          <section className="border border-[var(--color-accent-2)]/40 bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">
-              {t.contact.officesTitle}
-            </h2>
-            <div className="mt-5 grid gap-6 sm:grid-cols-2">
-              {SITE_CONTACT.offices.map((office) => (
-                <div key={office.id}>
-                  <h3 className="text-sm font-semibold text-[var(--color-accent)]">
+          <div className="relative min-h-[240px] overflow-hidden border border-[var(--color-sand-mid)] bg-[var(--color-accent)] lg:min-h-full">
+            <Image
+              src="/brand/transport-road.png"
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 45vw"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,42,74,0.75)] to-transparent" />
+            <p className="absolute bottom-4 left-4 text-sm font-medium text-white">
+              {locale === "da"
+                ? "Samme team — samme NOR."
+                : "The same team — the same NOR."}
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-14">
+          <p className="text-sm font-medium tracking-wide text-[var(--color-sand)] uppercase">
+            Team
+          </p>
+          <h2 className="display mt-2 text-3xl text-[var(--color-accent)]">
+            {t.contact.partnersTitle}
+          </h2>
+          <div className="mt-8 grid gap-6 sm:grid-cols-3">
+            {SITE_CONTACT.partners.map((p) => (
+              <article
+                key={p.email}
+                className="overflow-hidden border border-[var(--color-sand-mid)] bg-white"
+              >
+                <div className="relative aspect-[4/5] bg-[var(--color-accent)]">
+                  <Image
+                    src={p.photo}
+                    alt={p.name}
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                  />
+                </div>
+                <div className="p-5">
+                  <h3 className="text-base font-semibold text-[var(--color-ink)]">
+                    {p.name}
+                  </h3>
+                  <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
+                    {p.role}
+                  </p>
+                  <p className="mt-4 text-sm">
+                    <a
+                      href={`tel:${p.phoneTel}`}
+                      className="text-[var(--color-accent)] hover:underline"
+                    >
+                      {p.phone}
+                    </a>
+                  </p>
+                  <p className="mt-1 text-sm">
+                    <a
+                      href={`mailto:${p.email}`}
+                      className="hover:underline"
+                    >
+                      {p.email}
+                    </a>
+                  </p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-14">
+          <p className="text-sm font-medium tracking-wide text-[var(--color-sand)] uppercase">
+            {t.contact.officesTitle}
+          </p>
+          <h2 className="display mt-2 text-3xl text-[var(--color-accent)]">
+            {locale === "da" ? "Hirtshals & København" : "Hirtshals & Copenhagen"}
+          </h2>
+
+          <div className="mt-8 space-y-6">
+            {SITE_CONTACT.offices.map((office) => (
+              <article
+                key={office.id}
+                className="grid overflow-hidden border border-[var(--color-sand-mid)] bg-white lg:grid-cols-[0.9fr_1.1fr]"
+              >
+                <div className="p-6 sm:p-8">
+                  <h3 className="text-lg font-semibold text-[var(--color-accent)]">
                     {locale === "da" ? office.cityDa : office.cityEn}
                   </h3>
-                  <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-muted)]">
                     {SITE_CONTACT.company}
                     <br />
                     {office.lines.map((line) => (
@@ -70,43 +167,51 @@ export function ContactContent() {
                       </span>
                     ))}
                   </p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(office.mapQuery)}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-5 inline-flex text-sm font-medium text-[var(--color-accent)] hover:underline"
+                  >
+                    {locale === "da" ? "Åbn i Google Maps" : "Open in Google Maps"}
+                  </a>
                 </div>
-              ))}
-            </div>
-            <p className="mt-5 text-xs text-[var(--color-ink-muted)]">
-              {t.contact.cvr}
-            </p>
-          </section>
-
-          <section className="border border-[var(--color-border)] bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[var(--color-ink)]">
-              {t.contact.partnersTitle}
-            </h2>
-            <div className="mt-5 grid gap-5 sm:grid-cols-3">
-              {SITE_CONTACT.partners.map((p) => (
-                <div key={p.email}>
-                  <h3 className="text-sm font-semibold text-[var(--color-ink)]">
-                    {p.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-[var(--color-ink-muted)]">
-                    {p.role}
-                  </p>
-                  <p className="mt-3 text-sm">
-                    <a href={`tel:${p.phoneTel}`} className="hover:underline">
-                      {p.phone}
-                    </a>
-                  </p>
-                  <p className="text-sm">
-                    <a href={`mailto:${p.email}`} className="hover:underline">
-                      {p.email}
-                    </a>
-                  </p>
+                <div className="relative min-h-[220px] bg-[var(--color-sand-mid)] lg:min-h-[280px]">
+                  <iframe
+                    title={`${office.cityEn} map`}
+                    src={office.mapEmbed}
+                    className="absolute inset-0 h-full w-full border-0"
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
                 </div>
-              ))}
-            </div>
-          </section>
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
+
+        <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+          {[
+            "/brand/transport-road.png",
+            "/brand/transport-sea.webp",
+            "/brand/transport-air.webp",
+            "/brand/transport-rail.webp",
+          ].map((src) => (
+            <div
+              key={src}
+              className="relative aspect-[4/3] overflow-hidden border border-[var(--color-sand-mid)]"
+            >
+              <Image
+                src={src}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 50vw, 25vw"
+              />
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

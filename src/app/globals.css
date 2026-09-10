@@ -10,8 +10,11 @@
   --color-accent: #0b2a4a;
   --color-accent-hover: #061f36;
   --color-accent-2: #caa469;
+  --color-sand: #caa469;
+  --color-sand-soft: #f3eee6;
+  --color-sand-mid: #e8d9c4;
   --color-border: rgba(15, 23, 42, 0.16);
-  --color-soft: #f6f7f9;
+  --color-soft: #f3eee6;
   --ok: #1f7a4c;
   --danger: #b42318;
   --max-width: 1120px;

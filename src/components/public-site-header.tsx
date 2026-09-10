@@ -24,7 +24,7 @@ function LangSwitch({
         onClick={() => setLocale("da")}
         className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition ${
           locale === "da"
-            ? "bg-[#e8d9c4] text-[var(--color-accent)]"
+            ? "bg-[var(--color-sand-mid)] text-[var(--color-accent)]"
             : "text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
         }`}
         aria-pressed={locale === "da"}
@@ -36,7 +36,7 @@ function LangSwitch({
         onClick={() => setLocale("en")}
         className={`rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide transition ${
           locale === "en"
-            ? "bg-[#e8d9c4] text-[var(--color-accent)]"
+            ? "bg-[var(--color-sand-mid)] text-[var(--color-accent)]"
             : "text-[var(--color-ink-muted)] hover:text-[var(--color-ink)]"
         }`}
         aria-pressed={locale === "en"}
@@ -59,7 +59,7 @@ export function PublicSiteHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[rgba(15,23,42,0.08)] bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-[var(--color-sand-mid)] bg-[var(--color-sand-soft)]/95 backdrop-blur">
       <div className="mx-auto flex h-[4.75rem] max-w-[var(--max-width)] items-center justify-between gap-6 px-4 sm:px-6">
         <Link
           href="/"

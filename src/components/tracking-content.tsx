@@ -38,9 +38,12 @@ export function TrackingContent() {
   }
 
   return (
-    <div className="bg-[var(--color-soft)] py-12 sm:py-16">
+    <div className="bg-[var(--color-sand-soft)] py-12 sm:py-16">
       <div className="mx-auto max-w-[var(--max-width)] px-4 sm:px-6">
-        <h1 className="display text-4xl text-[var(--color-accent)] sm:text-5xl">
+        <p className="text-sm font-medium tracking-wide text-[var(--color-sand)] uppercase">
+          Nor Courier
+        </p>
+        <h1 className="display mt-2 text-4xl text-[var(--color-accent)] sm:text-5xl">
           {t.tracking.title}
         </h1>
         <p className="mt-3 max-w-2xl text-sm text-[var(--color-ink-muted)] sm:text-base">
