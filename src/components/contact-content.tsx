@@ -101,7 +101,7 @@ export function ContactContent() {
                 key={p.email}
                 className="overflow-hidden border border-[var(--color-sand-mid)] bg-white"
               >
-                <div className="relative aspect-[4/5] bg-[var(--color-accent)]">
+                <div className="relative aspect-[4/5] bg-white">
                   <Image
                     src={p.photo}
                     alt={p.name}
@@ -188,28 +188,6 @@ export function ContactContent() {
               </article>
             ))}
           </div>
-        </div>
-
-        <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-          {[
-            "/brand/transport-road.png",
-            "/brand/transport-sea.webp",
-            "/brand/transport-air.webp",
-            "/brand/transport-rail.webp",
-          ].map((src) => (
-            <div
-              key={src}
-              className="relative aspect-[4/3] overflow-hidden border border-[var(--color-sand-mid)]"
-            >
-              <Image
-                src={src}
-                alt=""
-                fill
-                className="object-cover"
-                sizes="(max-width: 640px) 50vw, 25vw"
-              />
-            </div>
-          ))}
         </div>
       </section>
     </div>
