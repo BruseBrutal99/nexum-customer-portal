@@ -2,14 +2,26 @@
 
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useLocale } from "@/components/i18n/locale-provider";
+
+function supabaseConfigured() {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  );
+}
 
 export function AuthPanel({ redirectTo = "/app" }: { redirectTo?: string }) {
   const { t } = useLocale();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const initialMode = searchParams.get("mode") === "signup" ? "signup" : "login";
+  const nextPath = searchParams.get("next");
+  const destination =
+    nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")
+      ? nextPath
+      : redirectTo;
+
   const [mode, setMode] = useState<"login" | "signup">(initialMode);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,32 +30,52 @@ export function AuthPanel({ redirectTo = "/app" }: { redirectTo?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  async function finishLogin() {
+    // Full navigation so auth cookies are present on the first /app request.
+    window.location.assign(destination);
+  }
+
   async function onLogin(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setLoading(false);
-
-    if (signInError) {
-      setError(signInError.message);
+    if (!supabaseConfigured()) {
+      setError("Login er ikke konfigureret endnu. Mangler Supabase-nøgler i drift.");
+      setLoading(false);
       return;
     }
 
-    router.push(redirectTo);
-    router.refresh();
+    try {
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      await finishLogin();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login fejlede");
+      setLoading(false);
+    }
   }
 
   async function onSignup(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (!supabaseConfigured()) {
+      setError("Login er ikke konfigureret endnu. Mangler Supabase-nøgler i drift.");
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch("/api/auth/signup", {
@@ -69,15 +101,13 @@ export function AuthPanel({ redirectTo = "/app" }: { redirectTo?: string }) {
         password,
       });
 
-      setLoading(false);
-
       if (signInError) {
         setError(signInError.message);
+        setLoading(false);
         return;
       }
 
-      router.push(redirectTo);
-      router.refresh();
+      await finishLogin();
     } catch {
       setLoading(false);
       setError("Signup failed");

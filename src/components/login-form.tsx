@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 export function LoginForm({
   title,
@@ -13,7 +12,6 @@ export function LoginForm({
   subtitle: string;
   redirectTo: string;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -24,21 +22,33 @@ export function LoginForm({
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setLoading(false);
-
-    if (signInError) {
-      setError(signInError.message);
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      setError("Login er ikke konfigureret endnu. Mangler Supabase-nøgler i drift.");
+      setLoading(false);
       return;
     }
 
-    router.push(redirectTo);
-    router.refresh();
+    try {
+      const supabase = createClient();
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      window.location.assign(redirectTo);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login fejlede");
+      setLoading(false);
+    }
   }
 
   return (
