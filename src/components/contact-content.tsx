@@ -34,58 +34,40 @@ export function ContactContent() {
       </section>
 
       <section className="mx-auto max-w-[var(--max-width)] px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="border border-[var(--color-sand-mid)] bg-white p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[var(--color-accent)]">
-              {t.contact.generalTitle}
-            </h2>
-            <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
-              {t.contact.generalText} {t.contact.hours}.
-            </p>
-            <ul className="mt-6 space-y-3 text-sm text-[var(--color-ink)]">
-              <li>
-                <span className="text-[var(--color-ink-muted)]">
-                  {t.contact.emailLabel}:{" "}
-                </span>
-                <a
-                  href={`mailto:${SITE_CONTACT.email}`}
-                  className="font-medium text-[var(--color-accent)] hover:underline"
-                >
-                  {SITE_CONTACT.email}
-                </a>
-              </li>
-              <li>
-                <span className="text-[var(--color-ink-muted)]">
-                  {t.contact.phoneLabel}:{" "}
-                </span>
-                <a
-                  href={`tel:${SITE_CONTACT.partners[0].phoneTel}`}
-                  className="font-medium hover:underline"
-                >
-                  {SITE_CONTACT.partners[0].phone}
-                </a>
-              </li>
-            </ul>
-            <p className="mt-6 text-xs text-[var(--color-ink-muted)]">
-              {t.contact.cvr}
-            </p>
-          </div>
-
-          <div className="relative min-h-[240px] overflow-hidden border border-[var(--color-sand-mid)] bg-[var(--color-accent)] lg:min-h-full">
-            <Image
-              src="/brand/transport-road.png"
-              alt=""
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 45vw"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[rgba(11,42,74,0.75)] to-transparent" />
-            <p className="absolute bottom-4 left-4 text-sm font-medium text-white">
-              {locale === "da"
-                ? "Samme team — samme NOR."
-                : "The same team — the same NOR."}
-            </p>
-          </div>
+        <div className="max-w-xl border border-[var(--color-sand-mid)] bg-white p-6 sm:p-8">
+          <h2 className="text-lg font-semibold text-[var(--color-accent)]">
+            {t.contact.generalTitle}
+          </h2>
+          <p className="mt-2 text-sm text-[var(--color-ink-muted)]">
+            {t.contact.generalText} {t.contact.hours}.
+          </p>
+          <ul className="mt-6 space-y-3 text-sm text-[var(--color-ink)]">
+            <li>
+              <span className="text-[var(--color-ink-muted)]">
+                {t.contact.emailLabel}:{" "}
+              </span>
+              <a
+                href={`mailto:${SITE_CONTACT.email}`}
+                className="font-medium text-[var(--color-accent)] hover:underline"
+              >
+                {SITE_CONTACT.email}
+              </a>
+            </li>
+            <li>
+              <span className="text-[var(--color-ink-muted)]">
+                {t.contact.phoneLabel}:{" "}
+              </span>
+              <a
+                href={`tel:${SITE_CONTACT.partners[0].phoneTel}`}
+                className="font-medium hover:underline"
+              >
+                {SITE_CONTACT.partners[0].phone}
+              </a>
+            </li>
+          </ul>
+          <p className="mt-6 text-xs text-[var(--color-ink-muted)]">
+            {t.contact.cvr}
+          </p>
         </div>
 
         <div className="mt-14">

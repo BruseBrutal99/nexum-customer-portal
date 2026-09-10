@@ -23,7 +23,7 @@ export function HomeContent() {
             alt=""
             fill
             priority
-            className="object-cover object-[58%_62%]"
+            className="object-cover object-[62%_78%]"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[rgba(6,26,48,0.18)] via-[rgba(6,26,48,0.28)] to-[rgba(6,26,48,0.55)]" />
         </div>
