@@ -42,11 +42,14 @@ export function LoginForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="panel w-full max-w-sm p-5">
-      <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
-      <p className="mt-1 text-sm text-[var(--ink-muted)]">{subtitle}</p>
+    <form
+      onSubmit={onSubmit}
+      className="w-full max-w-md border border-[var(--color-border)] bg-white p-6 sm:p-8"
+    >
+      <h1 className="display text-3xl text-[var(--color-ink)]">{title}</h1>
+      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{subtitle}</p>
 
-      <label className="field mt-4">
+      <label className="field mt-6">
         Email
         <input
           type="email"
@@ -74,7 +77,7 @@ export function LoginForm({
         </p>
       ) : null}
 
-      <button type="submit" disabled={loading} className="btn-primary mt-4 w-full">
+      <button type="submit" disabled={loading} className="btn-primary mt-5 w-full">
         {loading ? "Logger ind…" : "Log ind"}
       </button>
     </form>

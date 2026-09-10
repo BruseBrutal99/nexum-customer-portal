@@ -1,6 +1,8 @@
-# NOR Customer Portal
+# Nor Courier
 
-Dobbeltsidet portal til pris-check og benchmarking af NOR-produkter (fx Nor Express, Nor Economy).
+Kundeportal til pris-check og benchmarking af NOR-kurérprodukter.
+
+Design og brand følger [norspedition.dk](https://www.norspedition.dk).
 
 ## Scope (v1)
 

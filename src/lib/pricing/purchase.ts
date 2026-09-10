@@ -1,5 +1,5 @@
 import type { ShipmentInput } from "@/types/domain";
-import { chargeBasisForProduct } from "@/lib/pricing/chargeable";
+import { chargeBasisForProduct, cbmFromDims } from "@/lib/pricing/chargeable";
 import { quoteDemoPurchase, type PurchaseQuote } from "./demo-costs";
 
 export type TmsBatchQuote = {
@@ -22,10 +22,43 @@ export type TmsBatchResponse = {
   error?: string;
 };
 
+export type PurchaseQuoteWithOffer = PurchaseQuote & {
+  offerId?: string | null;
+};
+
 function tmsConfigured() {
   const mode = process.env.PRICING_MODE ?? "demo";
   const tmsUrl = process.env.TMS_QUOTE_API_URL?.trim();
   return mode === "tms" && Boolean(tmsUrl);
+}
+
+function shipmentPayload(shipment: ShipmentInput) {
+  return {
+    originCountry: shipment.originCountry,
+    originZip: shipment.originZip,
+    originCity: shipment.originCity,
+    originAddress: shipment.originAddress,
+    destinationCountry: shipment.destinationCountry,
+    destinationZip: shipment.destinationZip,
+    destinationCity: shipment.destinationCity,
+    destinationAddress: shipment.destinationAddress,
+    weightKg: shipment.weightKg,
+    colli: shipment.colli,
+    ldm: shipment.ldm,
+    lengthCm: shipment.lengthCm,
+    widthCm: shipment.widthCm,
+    heightCm: shipment.heightCm,
+    pickupDate: shipment.pickupDate,
+    goodsLines: shipment.goodsLines.map((g) => ({
+      quantity: g.quantity,
+      weightKg: g.weightKg,
+      lengthCm: g.lengthCm,
+      widthCm: g.widthCm,
+      heightCm: g.heightCm,
+      ldm: g.ldm,
+      cbm: g.cbm,
+    })),
+  };
 }
 
 /**
@@ -34,13 +67,12 @@ function tmsConfigured() {
 export async function quotePurchaseCostsBatch(
   shipment: ShipmentInput,
   costSourceKeys: string[],
-): Promise<Map<string, PurchaseQuote>> {
-  const uniqueKeys = [...new Set(costSourceKeys.filter(Boolean))];
-  const map = new Map<string, PurchaseQuote>();
+): Promise<Map<string, PurchaseQuoteWithOffer>> {
+  const uniqueKeys = Array.from(new Set(costSourceKeys.filter(Boolean)));
+  const map = new Map<string, PurchaseQuoteWithOffer>();
 
   if (!tmsConfigured()) {
     for (const key of uniqueKeys) {
-      // productCode only affects demo charge basis mapping
       const productCode =
         key === "cargoboard" ? "nor_express" : "nor_economy";
       map.set(key, await quoteDemoPurchase(key, shipment, productCode));
@@ -58,7 +90,7 @@ export async function quotePurchaseCostsBatch(
       ...(tmsKey ? { authorization: `Bearer ${tmsKey}` } : {}),
     },
     body: JSON.stringify({
-      shipment,
+      shipment: shipmentPayload(shipment),
       costSourceKeys: uniqueKeys,
     }),
     cache: "no-store",
@@ -66,8 +98,21 @@ export async function quotePurchaseCostsBatch(
 
   const data = (await res.json().catch(() => ({}))) as TmsBatchResponse;
   if (!res.ok) {
-    throw new Error(data.error ?? `TMS quote failed (${res.status})`);
+    throw new Error(
+      data.error ??
+        `TMS quote failed (${res.status})${
+          data.warnings?.length ? `: ${data.warnings.join("; ")}` : ""
+        }`,
+    );
   }
+
+  const cbm = shipment.goodsLines.reduce(
+    (s, g) =>
+      s +
+      (g.cbm ||
+        cbmFromDims(g.lengthCm, g.widthCm, g.heightCm, g.quantity)),
+    0,
+  );
 
   for (const key of uniqueKeys) {
     const matches = (data.quotes ?? []).filter((q) => q.costSourceKey === key);
@@ -93,21 +138,19 @@ export async function quotePurchaseCostsBatch(
       transitHint: best.transitHint,
       chargeBasis: chargeBasisForProduct(productCode),
       chargeableQuantity: best.chargeableLdm ?? data.chargeableLdm ?? 0,
-      cbm: 0,
+      cbm: Number(cbm.toFixed(4)),
+      offerId: best.offerId ?? null,
     });
   }
 
   return map;
 }
 
-/**
- * Fetches purchase (buy-side) quotes. Prefer batch helper from quote.ts.
- */
 export async function quotePurchaseCost(
   costSourceKey: string,
   shipment: ShipmentInput,
   productCode: string,
-): Promise<PurchaseQuote> {
+): Promise<PurchaseQuoteWithOffer> {
   if (!tmsConfigured()) {
     return quoteDemoPurchase(costSourceKey, shipment, productCode);
   }

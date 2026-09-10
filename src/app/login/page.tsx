@@ -1,13 +1,15 @@
-import { LoginForm } from "@/components/login-form";
+import { Suspense } from "react";
+import { AuthPanel } from "@/components/auth-panel";
+import { PublicShell } from "@/components/public-shell";
 
 export default function CustomerLoginPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm items-center px-4 py-10">
-      <LoginForm
-        title="Kunde-login"
-        subtitle="Tjek priser og benchmark produkter."
-        redirectTo="/app"
-      />
-    </main>
+    <PublicShell>
+      <div className="flex justify-center bg-[var(--color-soft)] px-4 py-12 sm:py-16">
+        <Suspense fallback={<div className="h-80 w-full max-w-md bg-white" />}>
+          <AuthPanel redirectTo="/app" />
+        </Suspense>
+      </div>
+    </PublicShell>
   );
 }

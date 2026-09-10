@@ -1,16 +1,29 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { DM_Sans, Instrument_Serif } from "next/font/google";
 import "./globals.css";
 
-const sans = localFont({
-  src: "./fonts/GeistVF.woff",
-  variable: "--font-sans",
-  weight: "100 900",
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
+  display: "swap",
+});
+
+const instrumentSerif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-instrument",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "NOR Portal",
-  description: "Tjek og sammenlign kurérpriser hos NOR",
+  title: "Nor Courier",
+  description: "Tjek og sammenlign kurérpriser hos NOR Spedition",
+  icons: {
+    icon: [
+      { url: "/brand/favicon-32.png", sizes: "32x32", type: "image/png" },
+    ],
+    apple: "/brand/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
@@ -20,7 +33,18 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="da">
-      <body className={`${sans.variable} antialiased`}>{children}</body>
+      <body
+        className={`${dmSans.variable} ${instrumentSerif.variable} antialiased`}
+        style={
+          {
+            ["--font-sans" as string]: "var(--font-dm-sans), system-ui, sans-serif",
+            ["--font-display" as string]:
+              "var(--font-instrument), Georgia, serif",
+          } as React.CSSProperties
+        }
+      >
+        {children}
+      </body>
     </html>
   );
 }

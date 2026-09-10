@@ -1,52 +1,26 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { requireRole } from "@/lib/auth/session";
 import { DEFAULT_PRODUCTS } from "@/lib/products/defaults";
 import { createServiceClient } from "@/lib/supabase/admin";
 import { apiError } from "@/lib/api/errors";
 
-const createCustomerSchema = z.object({
-  name: z.string().trim().min(1).max(120),
+const signupSchema = z.object({
   companyName: z.string().trim().min(1).max(160),
-  email: z.string().email().optional().or(z.literal("")),
-  tmsDebtorId: z.string().trim().max(80).optional().or(z.literal("")),
-  loginEmail: z.string().email(),
+  contactName: z.string().trim().min(1).max(120),
+  email: z.string().email(),
   password: z.string().min(8).max(72),
-  fullName: z.string().trim().min(1).max(120).optional(),
-  billingMode: z.enum(["prepaid", "invoice_credit"]).optional(),
 });
 
-export async function GET() {
-  const session = await requireRole("admin");
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const supabase = createServiceClient();
-    const { data, error } = await supabase
-      .from("portal_customers")
-      .select("*")
-      .order("company_name");
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ customers: data });
-  } catch (err) {
-    return apiError(err);
-  }
+function defaultSignupMarkup() {
+  const raw = process.env.PUBLIC_GUEST_MARKUP_PCT ?? "35";
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0) return 35;
+  return Math.min(n, 500);
 }
 
 export async function POST(request: Request) {
-  const session = await requireRole("admin");
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await request.json().catch(() => null);
-  const parsed = createCustomerSchema.safeParse(body);
+  const parsed = signupSchema.safeParse(body);
   if (!parsed.success) {
     return NextResponse.json(
       { error: "Ugyldigt input", details: parsed.error.flatten() },
@@ -57,15 +31,14 @@ export async function POST(request: Request) {
   try {
     const supabase = createServiceClient();
     const input = parsed.data;
+    const markupPct = defaultSignupMarkup();
 
     const { data: customer, error: customerError } = await supabase
       .from("portal_customers")
       .insert({
-        name: input.name,
+        name: input.contactName,
         company_name: input.companyName,
-        email: input.email || null,
-        tms_debtor_id: input.tmsDebtorId || null,
-        billing_mode: input.billingMode ?? "prepaid",
+        email: input.email,
       })
       .select("*")
       .single();
@@ -79,11 +52,11 @@ export async function POST(request: Request) {
 
     const { data: authData, error: authError } =
       await supabase.auth.admin.createUser({
-        email: input.loginEmail,
+        email: input.email,
         password: input.password,
         email_confirm: true,
         user_metadata: {
-          full_name: input.fullName ?? input.name,
+          full_name: input.contactName,
           role: "customer",
         },
       });
@@ -100,7 +73,7 @@ export async function POST(request: Request) {
       user_id: authData.user.id,
       role: "customer",
       customer_id: customer.id,
-      full_name: input.fullName ?? input.name,
+      full_name: input.contactName,
     });
 
     if (profileError) {
@@ -123,13 +96,13 @@ export async function POST(request: Request) {
         products.map((p) => ({
           customer_id: customer.id,
           product_id: p.id,
-          markup_pct: 0,
+          markup_pct: markupPct,
           is_enabled: true,
         })),
       );
     }
 
-    return NextResponse.json({ customer }, { status: 201 });
+    return NextResponse.json({ ok: true }, { status: 201 });
   } catch (err) {
     return apiError(err);
   }

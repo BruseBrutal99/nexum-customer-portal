@@ -17,6 +17,7 @@ export default async function AdminConsoleLayout({
       title="Admin"
       nav={[
         { href: "/admin", label: "Overblik" },
+        { href: "/admin/bookings", label: "Bookinger" },
         { href: "/admin/customers", label: "Kunder" },
         { href: "/admin/products", label: "Produkter" },
       ]}

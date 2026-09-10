@@ -1,13 +1,14 @@
+import { BrandAuthShell } from "@/components/brand-auth-shell";
 import { LoginForm } from "@/components/login-form";
 
 export default function AdminLoginPage() {
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm items-center px-4 py-10">
+    <BrandAuthShell eyebrow="Admin">
       <LoginForm
-        title="Admin"
-        subtitle="Kunder, passwords og markup."
+        title="Admin-login"
+        subtitle="Kundelogins, passwords og markup pr. produkt."
         redirectTo="/admin"
       />
-    </main>
+    </BrandAuthShell>
   );
 }
