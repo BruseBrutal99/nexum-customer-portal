@@ -17,6 +17,21 @@ Admin mapper hvert NOR-produkt til en intern `cost_source_key`.
 - Supabase Auth + Postgres
 - Pricing: demo-engine nu; klar til TMS quote-API (`PRICING_MODE=tms`)
 
+## Tre apps
+
+Portalen er en selvstændig app under `BruseBrutal99/nexum-customer-portal`. Den forbinder:
+
+| App | Rolle |
+|-----|--------|
+| **nexum-customer-portal** (dette repo) | Kunde-/admin-UI, markup, branded produkter |
+| **Nexum-TMS** | Indkøbspriser via `POST /api/portal/quote-costs` (API-key) |
+| **strom-forwarding** | Marketing-site med CTA «Kundeportal» |
+
+Produktmapping (portal → TMS `cost_source_key`):
+
+- `nor_express` → `cargoboard`
+- `nor_economy` → `atlantic_trucking`
+
 ## Kom i gang
 
 1. Opret et Supabase-projekt og kør migrationen i `supabase/migrations/`.
@@ -39,6 +54,26 @@ npm run dev
 - Kunde: http://localhost:3000/login → `/app`
 - Admin: http://localhost:3000/admin/login → `/admin`
 
+### Live priser fra TMS
+
+I Nexum-TMS (feature branch `feature/portal-quote-bridge`):
+
+```env
+PORTAL_QUOTE_API_KEY=<shared-secret>
+PORTAL_TMS_COMPANY_ID=<nor-company-uuid>
+```
+
+I denne portal:
+
+```env
+PRICING_MODE=tms
+TMS_QUOTE_API_URL=http://localhost:3001/api/portal/quote-costs
+# eller https://nexum-tms.vercel.app/api/portal/quote-costs
+TMS_QUOTE_API_KEY=<same-as-PORTAL_QUOTE_API_KEY>
+```
+
+Kør TMS på en anden port end portalen (fx `next dev -p 3001`), så quote-kaldet rammer bridge-endpointet.
+
 ## Prismodel
 
 ```
@@ -49,10 +84,10 @@ Markup sættes pr. **kunde × produkt**. Kun aktiverede produkter vises til kund
 
 ## Næste sprint
 
-1. Live indkøbspriser fra Nexum TMS API  
-2. Booking fra portal → TMS  
+1. Booking fra portal → TMS  
+2. Debtor-sync (`tms_debtor_id`)  
 3. TMS → leverandør via API  
 
 ## Repo
 
-Lokalt git-repo. Push til GitHub når I er klar (fx under samme org som Nexum-TMS).
+https://github.com/BruseBrutal99/nexum-customer-portal
