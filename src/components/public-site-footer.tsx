@@ -13,6 +13,7 @@ export function PublicSiteFooter() {
     { href: "/tracking", label: t.nav.tracking },
     { href: "/kontakt", label: t.nav.contact },
     { href: "/login", label: t.nav.loginSignup },
+    { href: "/admin/login", label: "Admin" },
     { href: SITE_CONTACT.website, label: "norspedition.dk", external: true },
   ];
 

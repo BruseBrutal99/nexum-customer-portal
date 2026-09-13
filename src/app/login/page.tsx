@@ -17,10 +17,19 @@ export default function CustomerLoginPage() {
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[rgba(11,42,74,0.35)] via-[rgba(243,238,230,0.45)] to-[rgba(243,238,230,0.82)]" />
         </div>
-        <div className="relative z-10 w-full max-w-md">
+        <div className="relative z-10 w-full max-w-md space-y-3">
           <Suspense fallback={<div className="h-80 w-full bg-white" />}>
             <AuthPanel redirectTo="/app" />
           </Suspense>
+          <p className="text-center text-sm text-[var(--color-ink-muted)]">
+            NOR-medarbejder?{" "}
+            <a
+              href="/admin/login"
+              className="font-medium text-[var(--color-accent)] hover:underline"
+            >
+              Admin-login
+            </a>
+          </p>
         </div>
       </div>
     </PublicShell>
