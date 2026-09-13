@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { apiError } from "@/lib/api/errors";
 import { requireRole } from "@/lib/auth/session";
+import { DEFAULT_PRODUCTS } from "@/lib/products/defaults";
 import { createServiceClient } from "@/lib/supabase/admin";
 
 const productSchema = z.object({
@@ -21,13 +22,25 @@ export async function GET() {
 
   try {
     const supabase = createServiceClient();
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("portal_products")
       .select("*")
       .order("sort_order");
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (!data?.length) {
+      const seeded = await supabase
+        .from("portal_products")
+        .upsert([...DEFAULT_PRODUCTS], { onConflict: "code" })
+        .select("*")
+        .order("sort_order");
+      if (seeded.error) {
+        return NextResponse.json({ error: seeded.error.message }, { status: 500 });
+      }
+      data = seeded.data;
     }
 
     return NextResponse.json({ products: data });
