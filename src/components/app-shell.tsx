@@ -29,17 +29,19 @@ export function AppShell({
       <header className="border-b border-[var(--color-border)] bg-white">
         <div className="mx-auto flex h-[var(--header-h)] max-w-[var(--max-width)] items-center justify-between gap-4 px-4 sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/app" className="flex items-center gap-2">
+            <Link
+              href={pathname.startsWith("/admin") ? "/admin" : "/app"}
+              className="inline-flex shrink-0 items-center"
+              aria-label="Nor Courier"
+            >
               <Image
-                src="/brand/logo-nor-spedition.png"
-                alt="NOR Spedition"
-                width={110}
-                height={61}
-                className="h-8 w-auto"
+                src="/brand/logo-nor-courier-transparent.png"
+                alt="Nor Courier"
+                width={180}
+                height={98}
+                className="h-9 w-auto sm:h-10"
+                priority
               />
-              <span className="text-sm font-semibold text-[var(--color-accent)]">
-                Nor Courier
-              </span>
             </Link>
             <span className="hidden truncate text-sm text-[var(--color-ink-muted)] sm:inline">
               / {title}
