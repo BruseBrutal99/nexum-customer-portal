@@ -1,5 +1,18 @@
 -- Customer profile fields + customer RLS for orders/profile
 -- Idempotent: safe to re-run in Supabase SQL editor
+-- Requires foundation + billing first (or paste RUN_ALL_PORTAL.sql once)
+
+do $$
+begin
+  if to_regclass('public.portal_customers') is null then
+    raise exception
+      'public.portal_customers does not exist. Run 202609090001_portal_foundation.sql first (or supabase/migrations/RUN_ALL_PORTAL.sql).';
+  end if;
+  if to_regclass('public.portal_booking_requests') is null then
+    raise exception
+      'public.portal_booking_requests does not exist. Run 202609100001_billing_and_booking_requests.sql first (or supabase/migrations/RUN_ALL_PORTAL.sql).';
+  end if;
+end $$;
 
 alter table public.portal_customers
   add column if not exists address text,

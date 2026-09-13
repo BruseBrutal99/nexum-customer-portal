@@ -1,5 +1,14 @@
 -- Billing mode + portal booking requests (payment gate before carrier book)
 -- Idempotent: safe to re-run in Supabase SQL editor
+-- Requires 202609090001_portal_foundation.sql first (or RUN_ALL_PORTAL.sql)
+
+do $$
+begin
+  if to_regclass('public.portal_customers') is null then
+    raise exception
+      'public.portal_customers does not exist. Run 202609090001_portal_foundation.sql first (or supabase/migrations/RUN_ALL_PORTAL.sql).';
+  end if;
+end $$;
 
 alter table public.portal_customers
   add column if not exists billing_mode text;

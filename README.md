@@ -21,7 +21,7 @@ Admin mapper hvert NOR-produkt til en intern `cost_source_key`.
 
 ## Kom i gang
 
-1. Opret et Supabase-projekt og kør migrationen i `supabase/migrations/`.
+1. Opret et Supabase-projekt og kør `supabase/migrations/RUN_ALL_PORTAL.sql` i SQL editor (idempotent; kører foundation → seed → billing → profile/orders).
 2. Kopiér `.env.example` → `.env.local` og udfyld nøgler.
 3. Opret første admin (Supabase SQL + Auth):
 
