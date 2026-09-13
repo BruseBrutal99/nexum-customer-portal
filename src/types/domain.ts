@@ -10,6 +10,20 @@ export type PortalCustomer = {
   tms_debtor_id: string | null;
   billing_mode: BillingMode;
   is_active: boolean;
+  address: string | null;
+  zip: string | null;
+  city: string | null;
+  country: string | null;
+  cvr: string | null;
+  contact_phone: string | null;
+  invoice_email: string | null;
+  finance_email: string | null;
+  invoice_language: string | null;
+  default_currency: string | null;
+  bank_name: string | null;
+  bank_reg_no: string | null;
+  bank_account: string | null;
+  iban: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -19,6 +33,19 @@ export type PortalPaymentStatus =
   | "credit_ok"
   | "paid"
   | "cancelled";
+
+export type PortalBookingShipment = {
+  originCountry?: string;
+  originZip?: string;
+  originCity?: string;
+  originAddress?: string;
+  destinationCountry?: string;
+  destinationZip?: string;
+  destinationCity?: string;
+  destinationAddress?: string;
+  pickupDate?: string;
+  goodsLines?: unknown;
+};
 
 export type PortalBookingRequest = {
   id: string;
@@ -33,6 +60,8 @@ export type PortalBookingRequest = {
   contact_name: string;
   contact_email: string;
   contact_phone: string | null;
+  shipment: PortalBookingShipment;
+  offer_snapshot?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 };
