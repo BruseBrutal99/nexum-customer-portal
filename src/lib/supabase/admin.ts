@@ -5,7 +5,12 @@ function looksLikeJwt(value: string) {
 }
 
 function looksLikeSecretKey(value: string) {
-  return value.startsWith("sb_secret_") || looksLikeJwt(value);
+  return (
+    value.startsWith("sb_secret_") ||
+    looksLikeJwt(value) ||
+    // Newer Supabase API key envelopes start with eyJ but are not classic JWTs.
+    (value.startsWith("eyJ") && value.length > 40)
+  );
 }
 
 export function createServiceClient(): SupabaseClient {

@@ -4,36 +4,57 @@ import { createServiceClient } from "@/lib/supabase/admin";
 import { DEFAULT_PRODUCTS } from "@/lib/products/defaults";
 import { redirect } from "next/navigation";
 
+async function loadAdminCounts() {
+  try {
+    const supabase = createServiceClient();
+
+    let { count: productCount } = await supabase
+      .from("portal_products")
+      .select("*", { count: "exact", head: true });
+
+    if (!productCount) {
+      await supabase
+        .from("portal_products")
+        .upsert([...DEFAULT_PRODUCTS], { onConflict: "code" });
+      const again = await supabase
+        .from("portal_products")
+        .select("*", { count: "exact", head: true });
+      productCount = again.count ?? 0;
+    }
+
+    const { count: customerCount } = await supabase
+      .from("portal_customers")
+      .select("*", { count: "exact", head: true });
+
+    const { count: openBookings } = await supabase
+      .from("portal_booking_requests")
+      .select("*", { count: "exact", head: true })
+      .in("payment_status", ["awaiting_payment", "credit_ok"]);
+
+    return {
+      customerCount: customerCount ?? 0,
+      productCount: productCount ?? 0,
+      openBookings: openBookings ?? 0,
+      error: null as string | null,
+    };
+  } catch (err) {
+    return {
+      customerCount: 0,
+      productCount: 0,
+      openBookings: 0,
+      error: err instanceof Error ? err.message : "Kunne ikke hente overblik",
+    };
+  }
+}
+
 export default async function AdminHomePage() {
   const session = await requireRole("admin");
   if (!session) {
     redirect("/admin/login");
   }
 
-  const supabase = createServiceClient();
-
-  let { count: productCount } = await supabase
-    .from("portal_products")
-    .select("*", { count: "exact", head: true });
-
-  if (!productCount) {
-    await supabase
-      .from("portal_products")
-      .upsert([...DEFAULT_PRODUCTS], { onConflict: "code" });
-    const again = await supabase
-      .from("portal_products")
-      .select("*", { count: "exact", head: true });
-    productCount = again.count ?? 0;
-  }
-
-  const { count: customerCount } = await supabase
-    .from("portal_customers")
-    .select("*", { count: "exact", head: true });
-
-  const { count: openBookings } = await supabase
-    .from("portal_booking_requests")
-    .select("*", { count: "exact", head: true })
-    .in("payment_status", ["awaiting_payment", "credit_ok"]);
+  const { customerCount, productCount, openBookings, error } =
+    await loadAdminCounts();
 
   return (
     <div className="space-y-6">
@@ -46,13 +67,19 @@ export default async function AdminHomePage() {
         </p>
       </div>
 
+      {error ? (
+        <p className="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          {error}
+        </p>
+      ) : null}
+
       <div className="grid gap-3 sm:grid-cols-3">
         <div className="panel">
           <p className="text-xs font-medium text-[var(--color-ink-muted)]">
             Kunder
           </p>
           <p className="mt-1 text-3xl font-semibold tabular-nums">
-            {customerCount ?? 0}
+            {customerCount}
           </p>
         </div>
         <div className="panel">
@@ -60,7 +87,7 @@ export default async function AdminHomePage() {
             Produkter
           </p>
           <p className="mt-1 text-3xl font-semibold tabular-nums">
-            {productCount ?? 0}
+            {productCount}
           </p>
         </div>
         <div className="panel">
@@ -68,15 +95,18 @@ export default async function AdminHomePage() {
             Åbne bookinger
           </p>
           <p className="mt-1 text-3xl font-semibold tabular-nums">
-            {openBookings ?? 0}
+            {openBookings}
           </p>
         </div>
       </div>
 
-      {(customerCount ?? 0) === 0 ? (
+      {customerCount === 0 && !error ? (
         <p className="border border-[var(--color-sand-mid)] bg-white px-4 py-3 text-sm text-[var(--color-ink-muted)]">
           Ingen kunder endnu. Opret den første under{" "}
-          <Link href="/admin/customers" className="font-medium text-[var(--color-accent)] hover:underline">
+          <Link
+            href="/admin/customers"
+            className="font-medium text-[var(--color-accent)] hover:underline"
+          >
             Kunder
           </Link>
           .

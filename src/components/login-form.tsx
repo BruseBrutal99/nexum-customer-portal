@@ -33,7 +33,7 @@ export function LoginForm({
 
     try {
       const supabase = createClient();
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
@@ -42,6 +42,24 @@ export function LoginForm({
         setError(signInError.message);
         setLoading(false);
         return;
+      }
+
+      const userId = data.user?.id;
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("portal_profiles")
+          .select("role")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (profile?.role === "admin") {
+          window.location.assign("/admin");
+          return;
+        }
+        if (profile?.role === "customer") {
+          window.location.assign("/app");
+          return;
+        }
       }
 
       window.location.assign(redirectTo);
