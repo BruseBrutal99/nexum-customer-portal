@@ -15,10 +15,6 @@ const tmsFrameAncestors = [
   .join(" ");
 
 const nextConfig = {
-  // Avoid OOM on small Vercel builders during lint/typecheck of large assets
-  experimental: {
-    webpackMemoryOptimizations: true,
-  },
   async headers() {
     return [
       {

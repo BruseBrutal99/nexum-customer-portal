@@ -22,16 +22,17 @@ export async function GET() {
 
   try {
     const supabase = createServiceClient();
-    let { data, error } = await supabase
+    const initial = await supabase
       .from("portal_products")
       .select("*")
       .order("sort_order");
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (initial.error) {
+      return NextResponse.json({ error: initial.error.message }, { status: 500 });
     }
 
-    if (!data?.length) {
+    let products = initial.data;
+    if (!products?.length) {
       const seeded = await supabase
         .from("portal_products")
         .upsert([...DEFAULT_PRODUCTS], { onConflict: "code" })
@@ -40,10 +41,10 @@ export async function GET() {
       if (seeded.error) {
         return NextResponse.json({ error: seeded.error.message }, { status: 500 });
       }
-      data = seeded.data;
+      products = seeded.data;
     }
 
-    return NextResponse.json({ products: data });
+    return NextResponse.json({ products });
   } catch (err) {
     return apiError(err);
   }
