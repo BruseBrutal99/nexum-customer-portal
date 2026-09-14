@@ -13,6 +13,7 @@ const createCustomerSchema = z.object({
   loginEmail: z.string().email(),
   password: z.string().min(8).max(72),
   fullName: z.string().trim().min(1).max(120).optional(),
+  billingMode: z.enum(["prepaid", "invoice_credit"]).optional(),
 });
 
 export async function GET() {
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
         company_name: input.companyName,
         email: input.email || null,
         tms_debtor_id: input.tmsDebtorId || null,
+        billing_mode: input.billingMode ?? "prepaid",
       })
       .select("*")
       .single();

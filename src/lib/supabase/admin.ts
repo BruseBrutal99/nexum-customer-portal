@@ -5,7 +5,12 @@ function looksLikeJwt(value: string) {
 }
 
 function looksLikeSecretKey(value: string) {
-  return value.startsWith("sb_secret_") || looksLikeJwt(value);
+  return (
+    value.startsWith("sb_secret_") ||
+    looksLikeJwt(value) ||
+    // Newer Supabase API key envelopes start with eyJ but are not classic JWTs.
+    (value.startsWith("eyJ") && value.length > 40)
+  );
 }
 
 export function createServiceClient(): SupabaseClient {
@@ -14,7 +19,13 @@ export function createServiceClient(): SupabaseClient {
 
   if (!url || !key) {
     throw new Error(
-      "Mangler SUPABASE_SERVICE_ROLE_KEY eller NEXT_PUBLIC_SUPABASE_URL i .env.local",
+      "Mangler SUPABASE_SERVICE_ROLE_KEY eller NEXT_PUBLIC_SUPABASE_URL i Vercel/miljøvariabler.",
+    );
+  }
+
+  if (!url.startsWith("https://")) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL skal være en https://… Supabase-URL (ikke en API-nøgle).",
     );
   }
 

@@ -1,6 +1,8 @@
-# NOR Customer Portal
+# Nor Courier
 
-Dobbeltsidet portal til pris-check og benchmarking af NOR-produkter (fx Nor Express, Nor Economy).
+Kundeportal til pris-check og benchmarking af NOR-kurérprodukter.
+
+Design og brand følger [norspedition.dk](https://www.norspedition.dk).
 
 ## Scope (v1)
 
@@ -19,7 +21,7 @@ Admin mapper hvert NOR-produkt til en intern `cost_source_key`.
 
 ## Kom i gang
 
-1. Opret et Supabase-projekt og kør migrationen i `supabase/migrations/`.
+1. Opret et Supabase-projekt og kør `supabase/migrations/RUN_ALL_PORTAL.sql` i SQL editor (idempotent; kører foundation → seed → billing → profile/orders).
 2. Kopiér `.env.example` → `.env.local` og udfyld nøgler.
 3. Opret første admin (Supabase SQL + Auth):
 

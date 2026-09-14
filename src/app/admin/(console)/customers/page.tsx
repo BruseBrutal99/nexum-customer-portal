@@ -16,6 +16,7 @@ export default function AdminCustomersPage() {
     loginEmail: "",
     password: "",
     fullName: "",
+    billingMode: "prepaid" as "prepaid" | "invoice_credit",
   });
 
   async function load() {
@@ -57,6 +58,7 @@ export default function AdminCustomersPage() {
       loginEmail: "",
       password: "",
       fullName: "",
+      billingMode: "prepaid",
     });
     await load();
   }
@@ -141,6 +143,22 @@ export default function AdminCustomersPage() {
               placeholder="valgfri"
             />
           </label>
+          <label className="field sm:col-span-2">
+            Betaling
+            <select
+              value={form.billingMode}
+              onChange={(e) =>
+                setForm((f) => ({
+                  ...f,
+                  billingMode: e.target.value as "prepaid" | "invoice_credit",
+                }))
+              }
+              className="field-input"
+            >
+              <option value="prepaid">Forudbetaling (manuel godkendelse)</option>
+              <option value="invoice_credit">Kredit / faktura</option>
+            </select>
+          </label>
         </div>
         {error ? (
           <p className="mt-2 text-sm text-[var(--danger)]">{error}</p>
@@ -164,15 +182,36 @@ export default function AdminCustomersPage() {
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">{c.company_name}</p>
                 <p className="truncate text-xs text-[var(--ink-muted)]">
-                  {c.name}
+                  {c.name} ·{" "}
+                  {c.billing_mode === "invoice_credit"
+                    ? "Kredit/faktura"
+                    : "Forudbetaling"}
                 </p>
               </div>
-              <Link
-                href={`/admin/customers/${c.id}`}
-                className="shrink-0 text-xs font-medium text-[var(--brand)] hover:underline"
-              >
-                Markup
-              </Link>
+              <div className="flex shrink-0 items-center gap-2">
+                <select
+                  className="field-input mt-0 py-1 text-xs"
+                  value={c.billing_mode ?? "prepaid"}
+                  onChange={async (e) => {
+                    const billingMode = e.target.value;
+                    await fetch(`/api/admin/customers/${c.id}`, {
+                      method: "PATCH",
+                      headers: { "content-type": "application/json" },
+                      body: JSON.stringify({ billingMode }),
+                    });
+                    await load();
+                  }}
+                >
+                  <option value="prepaid">Forudbetaling</option>
+                  <option value="invoice_credit">Kredit</option>
+                </select>
+                <Link
+                  href={`/admin/customers/${c.id}`}
+                  className="text-xs font-medium text-[var(--brand)] hover:underline"
+                >
+                  Markup
+                </Link>
+              </div>
             </li>
           ))}
           {!customers.length ? (

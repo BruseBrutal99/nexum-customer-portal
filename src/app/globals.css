@@ -3,20 +3,39 @@
 @tailwind utilities;
 
 :root {
-  --bg: #f3f5f7;
-  --ink: #122033;
-  --ink-muted: #66768a;
-  --line: #dde3ea;
-  --brand: #0b3a53;
-  --brand-strong: #072636;
+  --color-bg: #ffffff;
+  --color-surface: #ffffff;
+  --color-ink: #0f172a;
+  --color-ink-muted: rgba(15, 23, 42, 0.72);
+  --color-accent: #0b2a4a;
+  --color-accent-hover: #061f36;
+  --color-accent-2: #caa469;
+  --color-sand: #caa469;
+  --color-sand-soft: #f3eee6;
+  --color-sand-mid: #e8d9c4;
+  --color-border: rgba(15, 23, 42, 0.16);
+  --color-soft: #f3eee6;
   --ok: #1f7a4c;
   --danger: #b42318;
+  --max-width: 1120px;
+  --header-h: 4.25rem;
+  --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial,
+    sans-serif;
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+
+  /* legacy aliases used in existing components */
+  --bg: var(--color-soft);
+  --ink: var(--color-ink);
+  --ink-muted: var(--color-ink-muted);
+  --line: var(--color-border);
+  --brand: var(--color-accent);
+  --brand-strong: var(--color-accent-hover);
 }
 
 body {
-  color: var(--ink);
-  background: var(--bg);
-  font-family: var(--font-sans), "Segoe UI", sans-serif;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-family: var(--font-sans);
   min-height: 100vh;
 }
 
@@ -34,26 +53,70 @@ button {
 
 @layer components {
   .panel {
-    @apply rounded-lg border border-[var(--line)] bg-white p-4;
+    @apply border bg-white p-4;
+    border-color: var(--color-border);
+    border-radius: 0;
   }
 
   .field {
-    @apply block text-xs font-medium text-[var(--ink-muted)];
+    @apply block text-xs font-medium;
+    color: var(--color-ink-muted);
   }
 
   .field-input {
-    @apply mt-1 w-full rounded border border-[var(--line)] bg-white px-2.5 py-1.5 text-sm text-[var(--ink)] outline-none focus:border-[var(--brand)];
+    @apply mt-1 w-full border bg-white px-2.5 py-2 text-sm outline-none;
+    border-color: var(--color-border);
+    color: var(--color-ink);
+    border-radius: 0;
+  }
+
+  .field-input:focus {
+    border-color: var(--color-accent);
   }
 
   .btn {
-    @apply inline-flex items-center justify-center rounded px-3 py-1.5 text-sm font-medium transition;
+    @apply inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium transition;
+    border-radius: 0;
   }
 
   .btn-primary {
-    @apply btn bg-[var(--brand)] text-white hover:bg-[var(--brand-strong)] disabled:opacity-60;
+    @apply btn text-white;
+    background: var(--color-accent);
+    border: 1px solid var(--color-accent);
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.6;
   }
 
   .btn-ghost {
-    @apply btn border border-[var(--line)] bg-white text-[var(--ink)] hover:bg-slate-50;
+    @apply btn;
+    background: #fff;
+    border: 1px solid var(--color-border);
+    color: var(--color-ink);
+  }
+
+  .btn-ghost:hover {
+    background: var(--color-soft);
+  }
+
+  .btn-outline-light {
+    @apply btn text-white;
+    border: 1px solid rgba(255, 255, 255, 0.65);
+    background: transparent;
+  }
+
+  .btn-outline-light:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
   }
 }

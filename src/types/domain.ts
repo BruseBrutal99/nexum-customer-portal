@@ -1,12 +1,67 @@
 export type PortalRole = "admin" | "customer";
 
+export type BillingMode = "prepaid" | "invoice_credit";
+
 export type PortalCustomer = {
   id: string;
   name: string;
   company_name: string;
   email: string | null;
   tms_debtor_id: string | null;
+  billing_mode: BillingMode;
   is_active: boolean;
+  address: string | null;
+  zip: string | null;
+  city: string | null;
+  country: string | null;
+  cvr: string | null;
+  contact_phone: string | null;
+  invoice_email: string | null;
+  finance_email: string | null;
+  invoice_language: string | null;
+  default_currency: string | null;
+  bank_name: string | null;
+  bank_reg_no: string | null;
+  bank_account: string | null;
+  iban: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PortalPaymentStatus =
+  | "awaiting_payment"
+  | "credit_ok"
+  | "paid"
+  | "cancelled";
+
+export type PortalBookingShipment = {
+  originCountry?: string;
+  originZip?: string;
+  originCity?: string;
+  originAddress?: string;
+  destinationCountry?: string;
+  destinationZip?: string;
+  destinationCity?: string;
+  destinationAddress?: string;
+  pickupDate?: string;
+  goodsLines?: unknown;
+};
+
+export type PortalBookingRequest = {
+  id: string;
+  tms_booking_id: string | null;
+  tms_booking_number: string | null;
+  customer_id: string | null;
+  payment_status: PortalPaymentStatus;
+  product_code: string;
+  product_name: string;
+  sell_amount_dkk: number;
+  company_name: string;
+  contact_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  shipment: PortalBookingShipment;
+  offer_snapshot?: Record<string, unknown>;
   created_at: string;
   updated_at: string;
 };
@@ -45,13 +100,27 @@ export type PortalProfile = {
 
 export type ChargeBasis = "ldm" | "cbm";
 
+export type GoodsLineInput = {
+  quantity: number;
+  weightKg: number;
+  lengthCm: number;
+  widthCm: number;
+  heightCm: number;
+  ldm: number;
+  cbm: number;
+};
+
 export type ShipmentInput = {
   originCountry: string;
   originZip: string;
   originCity: string;
+  originAddress: string;
   destinationCountry: string;
   destinationZip: string;
   destinationCity: string;
+  destinationAddress: string;
+  goodsLines: GoodsLineInput[];
+  /** Aggregates of goodsLines (compat with older helpers) */
   weightKg: number;
   colli: number;
   ldm: number;
@@ -72,6 +141,7 @@ export type CustomerQuoteOffer = {
   chargeBasis: ChargeBasis;
   chargeableQuantity: number;
   cbm: number;
+  offerId?: string | null;
 };
 
 export type AdminQuoteOffer = CustomerQuoteOffer & {

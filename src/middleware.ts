@@ -21,7 +21,13 @@ export async function middleware(request: NextRequest) {
         );
         supabaseResponse = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          supabaseResponse.cookies.set(name, value, options),
+          supabaseResponse.cookies.set(name, value, {
+            ...options,
+            // Needed so TMS iframe (cross-site) can keep the portal session.
+            sameSite: "none",
+            secure: true,
+            partitioned: true,
+          }),
         );
       },
     },

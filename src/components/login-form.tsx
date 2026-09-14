@@ -2,7 +2,6 @@
 
 import { FormEvent, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
 
 export function LoginForm({
   title,
@@ -13,7 +12,6 @@ export function LoginForm({
   subtitle: string;
   redirectTo: string;
 }) {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -24,29 +22,62 @@ export function LoginForm({
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    setLoading(false);
-
-    if (signInError) {
-      setError(signInError.message);
+    if (
+      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    ) {
+      setError("Login er ikke konfigureret endnu. Mangler Supabase-nøgler i drift.");
+      setLoading(false);
       return;
     }
 
-    router.push(redirectTo);
-    router.refresh();
+    try {
+      const supabase = createClient();
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      const userId = data.user?.id;
+      if (userId) {
+        const { data: profile } = await supabase
+          .from("portal_profiles")
+          .select("role")
+          .eq("user_id", userId)
+          .maybeSingle();
+
+        if (profile?.role === "admin") {
+          window.location.assign("/admin");
+          return;
+        }
+        if (profile?.role === "customer") {
+          window.location.assign("/app");
+          return;
+        }
+      }
+
+      window.location.assign(redirectTo);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login fejlede");
+      setLoading(false);
+    }
   }
 
   return (
-    <form onSubmit={onSubmit} className="panel w-full max-w-sm p-5">
-      <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
-      <p className="mt-1 text-sm text-[var(--ink-muted)]">{subtitle}</p>
+    <form
+      onSubmit={onSubmit}
+      className="w-full max-w-md border border-[var(--color-border)] bg-white p-6 sm:p-8"
+    >
+      <h1 className="display text-3xl text-[var(--color-ink)]">{title}</h1>
+      <p className="mt-2 text-sm text-[var(--color-ink-muted)]">{subtitle}</p>
 
-      <label className="field mt-4">
+      <label className="field mt-6">
         Email
         <input
           type="email"
@@ -74,7 +105,7 @@ export function LoginForm({
         </p>
       ) : null}
 
-      <button type="submit" disabled={loading} className="btn-primary mt-4 w-full">
+      <button type="submit" disabled={loading} className="btn-primary mt-5 w-full">
         {loading ? "Logger ind…" : "Log ind"}
       </button>
     </form>

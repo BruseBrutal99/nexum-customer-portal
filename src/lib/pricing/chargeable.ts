@@ -10,6 +10,18 @@ export function cbmFromDims(
   return Number(total.toFixed(4));
 }
 
+/** Floor-area LDM: (L×W in m) / 2.4 × quantity — used when UI hides LDM. */
+export function ldmFromDims(
+  lengthCm: number,
+  widthCm: number,
+  quantity: number,
+) {
+  const qty = Number.isFinite(quantity) && quantity > 0 ? quantity : 1;
+  const floorM2 = (lengthCm / 100) * (widthCm / 100);
+  const total = (floorM2 / 2.4) * qty;
+  return Math.max(Number(total.toFixed(3)), 0.01);
+}
+
 export type ChargeBasis = "ldm" | "cbm";
 
 /** Product code → how the mapped supplier rates the shipment (check-price style) */
